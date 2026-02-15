@@ -281,3 +281,46 @@
 (define-read-only (retrieve-licensing-contract-information (contract-identifier uint))
   (map-get? licensing-contract-database { licensing-contract-id: contract-identifier })
 )
+
+(define-read-only (retrieve-royalty-transaction-information (transaction-identifier uint))
+  (map-get? royalty-transaction-database { royalty-transaction-id: transaction-identifier })
+)
+
+(define-read-only (validate-contract-operational-status (contract-identifier uint))
+  (match (map-get? licensing-contract-database { licensing-contract-id: contract-identifier })
+    contract-data (and
+      (get contract-operational-status contract-data)
+      (<= stacks-block-height (get contract-termination-block contract-data))
+    )
+    false
+  )
+)
+
+(define-read-only (retrieve-user-technology-access-details
+    (user-address principal)
+    (technology-identifier uint)
+  )
+  (map-get? technology-access-database {
+    authorized-user-address: user-address,
+    technology-reference: technology-identifier,
+  })
+)
+
+(define-read-only (verify-user-technology-access-authorization
+    (user-address principal)
+    (technology-identifier uint)
+  )
+  (match (map-get? technology-access-database {
+    authorized-user-address: user-address,
+    technology-reference: technology-identifier,
+  })
+    access-data (match (map-get? licensing-contract-database { licensing-contract-id: (get linked-licensing-contract access-data) })
+      contract-data (and
+        (get contract-operational-status contract-data)
+        (<= stacks-block-height (get contract-termination-block contract-data))
+      )
+      false
+    )
+    false
+  )
+)
