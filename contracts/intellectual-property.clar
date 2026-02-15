@@ -249,3 +249,35 @@
     (asserts! (get contract-operational-status contract-record)
       ERR-LICENSE-CONTRACT-INACTIVE
     )
+
+    (map-set licensing-contract-database { licensing-contract-id: target-contract-id }
+      (merge contract-record { contract-operational-status: false })
+    )
+
+    (map-set technology-access-database {
+      authorized-user-address: (get technology-licensee-address contract-record),
+      technology-reference: (get licensed-technology-reference contract-record),
+    } {
+      linked-licensing-contract: target-contract-id,
+      access-permission-active: false,
+    })
+
+    (print {
+      marketplace-event: "licensing-contract-revoked",
+      revoked-contract-id: target-contract-id,
+      revocation-initiator: tx-sender,
+    })
+
+    (ok true)
+  )
+)
+
+;; Information retrieval and query functions
+
+(define-read-only (retrieve-quantum-technology-information (technology-identifier uint))
+  (map-get? quantum-technology-database { quantum-tech-id: technology-identifier })
+)
+
+(define-read-only (retrieve-licensing-contract-information (contract-identifier uint))
+  (map-get? licensing-contract-database { licensing-contract-id: contract-identifier })
+)
