@@ -203,3 +203,49 @@
     (asserts! (<= updated-royalty-rate maximum-royalty-percentage)
       ERR-INVALID-INPUT-PARAMETERS
     )
+
+    (map-set quantum-technology-database { quantum-tech-id: technology-id }
+      (merge technology-record {
+        base-licensing-cost: updated-licensing-fee,
+        ongoing-royalty-percentage: updated-royalty-rate,
+        licensing-availability-status: availability-toggle,
+      })
+    )
+
+    (print {
+      marketplace-event: "technology-terms-modified",
+      technology-id: technology-id,
+      modifier-address: tx-sender,
+      new-licensing-fee: updated-licensing-fee,
+      new-royalty-rate: updated-royalty-rate,
+      availability-status: availability-toggle,
+    })
+
+    (ok true)
+  )
+)
+
+(define-public (revoke-licensing-contract (target-contract-id uint))
+  (let ((contract-record (unwrap!
+      (map-get? licensing-contract-database { licensing-contract-id: target-contract-id })
+      ERR-QUANTUM-IP-NOT-FOUND
+    )))
+    (asserts! (var-get quantum-marketplace-operational)
+      ERR-UNAUTHORIZED-OPERATION
+    )
+    (asserts! (> target-contract-id minimum-positive-amount)
+      ERR-INVALID-INPUT-PARAMETERS
+    )
+    (asserts! (< target-contract-id (var-get next-licensing-contract-identifier))
+      ERR-QUANTUM-IP-NOT-FOUND
+    )
+    (asserts!
+      (or
+        (is-eq tx-sender (get technology-licensor-address contract-record))
+        (is-eq tx-sender (get technology-licensee-address contract-record))
+      )
+      ERR-UNAUTHORIZED-OPERATION
+    )
+    (asserts! (get contract-operational-status contract-record)
+      ERR-LICENSE-CONTRACT-INACTIVE
+    )
