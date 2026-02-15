@@ -324,3 +324,30 @@
     false
   )
 )
+
+(define-read-only (retrieve-marketplace-operational-metrics)
+  {
+    registered-technologies-total: (var-get registered-quantum-technologies-counter),
+    active-contracts-total: (var-get active-licensing-contracts-counter),
+    marketplace-commission-rate: (var-get marketplace-commission-percentage),
+    marketplace-operational-status: (var-get quantum-marketplace-operational),
+    current-blockchain-block: stacks-block-height,
+  }
+)
+
+;; Administrative control and configuration functions
+
+(define-public (configure-marketplace-commission-rate (new-commission-rate uint))
+  (begin
+    (asserts! (is-eq tx-sender contract-administrator) ERR-UNAUTHORIZED-OPERATION)
+    (asserts! (<= new-commission-rate maximum-marketplace-commission)
+      ERR-INVALID-INPUT-PARAMETERS
+    )
+    (var-set marketplace-commission-percentage new-commission-rate)
+    (print {
+      marketplace-event: "commission-rate-configured",
+      updated-rate: new-commission-rate,
+    })
+    (ok true)
+  )
+)
