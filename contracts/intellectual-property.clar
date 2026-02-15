@@ -351,3 +351,17 @@
     (ok true)
   )
 )
+
+(define-public (toggle-marketplace-operational-status)
+  (begin
+    (asserts! (is-eq tx-sender contract-administrator) ERR-UNAUTHORIZED-OPERATION)
+    (var-set quantum-marketplace-operational
+      (not (var-get quantum-marketplace-operational))
+    )
+    (print {
+      marketplace-event: "operational-status-toggled",
+      operational-status: (var-get quantum-marketplace-operational),
+    })
+    (ok (var-get quantum-marketplace-operational))
+  )
+)
