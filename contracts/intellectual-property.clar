@@ -140,3 +140,37 @@
       )
       ERR-INVALID-INPUT-PARAMETERS
     )
+
+    (map-set quantum-technology-database { quantum-tech-id: new-technology-id } {
+      technology-owner-address: tx-sender,
+      technology-commercial-title: technology-title,
+      technology-detailed-summary: technology-summary,
+      base-licensing-cost: licensing-fee,
+      ongoing-royalty-percentage: royalty-rate,
+      licensing-availability-status: true,
+      technology-registration-block: stacks-block-height,
+    })
+
+    (map-set technology-ownership-database {
+      owner-address: tx-sender,
+      technology-reference: new-technology-id,
+    } { ownership-confirmed: true }
+    )
+
+    (var-set next-quantum-technology-identifier (+ new-technology-id u1))
+    (var-set registered-quantum-technologies-counter
+      (+ (var-get registered-quantum-technologies-counter) u1)
+    )
+
+    (print {
+      marketplace-event: "quantum-technology-registered",
+      technology-id: new-technology-id,
+      owner-address: tx-sender,
+      technology-title: technology-title,
+      licensing-cost: licensing-fee,
+      royalty-rate: royalty-rate,
+    })
+
+    (ok new-technology-id)
+  )
+)
