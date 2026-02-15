@@ -57,3 +57,32 @@
     technology-registration-block: uint,
   }
 )
+
+;; Licensing contract management registry
+(define-map licensing-contract-database
+  { licensing-contract-id: uint }
+  {
+    licensed-technology-reference: uint,
+    technology-licensee-address: principal,
+    technology-licensor-address: principal,
+    contract-activation-block: uint,
+    contract-termination-block: uint,
+    total-licensing-payment: uint,
+    negotiated-royalty-percentage: uint,
+    contract-operational-status: bool,
+    contract-creation-block: uint,
+  }
+)
+
+;; Royalty payment transaction registry
+(define-map royalty-transaction-database
+  { royalty-transaction-id: uint }
+  {
+    source-licensing-contract: uint,
+    payment-sender-address: principal,
+    payment-receiver-address: principal,
+    transaction-total-amount: uint,
+    transaction-processing-block: uint,
+    related-technology-reference: uint,
+  }
+)
