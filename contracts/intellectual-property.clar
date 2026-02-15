@@ -30,3 +30,30 @@
 (define-constant minimum-positive-amount u1)
 (define-constant maximum-technology-title-length u100)
 (define-constant maximum-technology-summary-length u500)
+
+;; Marketplace operational state variables
+(define-data-var quantum-marketplace-operational bool true)
+(define-data-var registered-quantum-technologies-counter uint u0)
+(define-data-var active-licensing-contracts-counter uint u0)
+(define-data-var marketplace-commission-percentage uint u250)
+
+;; Unique identifier generation counters
+(define-data-var next-quantum-technology-identifier uint u1)
+(define-data-var next-licensing-contract-identifier uint u1)
+(define-data-var next-royalty-transaction-identifier uint u1)
+
+;; Core marketplace data storage structures
+
+;; Quantum technology intellectual property registry
+(define-map quantum-technology-database
+  { quantum-tech-id: uint }
+  {
+    technology-owner-address: principal,
+    technology-commercial-title: (string-ascii 100),
+    technology-detailed-summary: (string-ascii 500),
+    base-licensing-cost: uint,
+    ongoing-royalty-percentage: uint,
+    licensing-availability-status: bool,
+    technology-registration-block: uint,
+  }
+)
