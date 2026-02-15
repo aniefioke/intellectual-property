@@ -174,3 +174,32 @@
     (ok new-technology-id)
   )
 )
+
+(define-public (modify-technology-licensing-terms
+    (technology-id uint)
+    (updated-licensing-fee uint)
+    (updated-royalty-rate uint)
+    (availability-toggle bool)
+  )
+  (let ((technology-record (unwrap!
+      (map-get? quantum-technology-database { quantum-tech-id: technology-id })
+      ERR-QUANTUM-IP-NOT-FOUND
+    )))
+    (asserts! (var-get quantum-marketplace-operational)
+      ERR-UNAUTHORIZED-OPERATION
+    )
+    (asserts! (> technology-id minimum-positive-amount)
+      ERR-INVALID-INPUT-PARAMETERS
+    )
+    (asserts! (< technology-id (var-get next-quantum-technology-identifier))
+      ERR-QUANTUM-IP-NOT-FOUND
+    )
+    (asserts! (is-eq tx-sender (get technology-owner-address technology-record))
+      ERR-UNAUTHORIZED-OPERATION
+    )
+    (asserts! (> updated-licensing-fee minimum-positive-amount)
+      ERR-INVALID-INPUT-PARAMETERS
+    )
+    (asserts! (<= updated-royalty-rate maximum-royalty-percentage)
+      ERR-INVALID-INPUT-PARAMETERS
+    )
